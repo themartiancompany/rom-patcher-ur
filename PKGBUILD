@@ -215,6 +215,18 @@ prepare() {
   fi
 }
 
+build() {
+  cd \
+    "${_tarname}"
+  npm \
+    install
+  npm \
+    pack
+  mv \
+    "${_Pkg}-${_pkgver}.tgz" \
+    "${srcdir}"
+}
+
 package_rom-patcher() {
   local \
     _npm_options=() \
@@ -238,7 +250,7 @@ package_rom-patcher() {
   npm \
     install \
     "${_npm_options[@]}" \
-    "${srcdir}/${_pkg}-${pkgver}.tgz"
+    "${srcdir}/${_Pkg}-${_pkgver}.tgz"
   rm \
     -fr \
       "${pkgdir}/usr/etc"
