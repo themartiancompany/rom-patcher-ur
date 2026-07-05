@@ -52,7 +52,7 @@ if [[ "${_os}" == "Android" ]]; then
   _node="nodejs-lts"
 fi
 if [[ ! -v "_git" ]]; then
-  _git="true"
+  _git="false"
 fi
 if [[ ! -v "_npm" ]]; then
   _npm="false"
@@ -174,6 +174,49 @@ sha256sums+=(
 noextract=(
   "${_tarfile}"
 )
+
+_git_unbundle() {
+  local \
+    _tarname="${1}" \
+    _bundle \
+    _repo \
+    _msg=()
+  _bundle="${srcdir}/${_tarname}.bundle"
+  _repo="${srcdir}/${_tarname}"
+  _msg=(
+    "Cloning '${_bundle}' into '${_repo}'."
+  )
+  msg \
+    "${_msg[*]}"
+  git \
+    clone \
+      "${_bundle}" \
+      "${_repo}" || \
+  git \
+    -C \
+      "${_repo}" \
+      pull || \
+  true
+}
+
+prepare() {
+  local \
+    _bash_files=() \
+    _file \
+    _like \
+    _os \
+    _src
+  _like="never-gonna-give-you-up"
+  if [[ "${_evmfs}" == "true" ]]; then
+    if [[ "${_git}" == "false" ]]; then
+      ur \
+        "${_like}"
+    elif [[ "${_git}" == "true" ]]; then
+      _git_unbundle \
+        "${_tarname}"
+    fi
+  fi
+}
 
 package_rom-patcher() {
   local \
