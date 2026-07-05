@@ -208,10 +208,7 @@ prepare() {
     _src
   _like="never-gonna-give-you-up"
   if [[ "${_evmfs}" == "true" ]]; then
-    if [[ "${_git}" == "false" ]]; then
-      ur \
-        "${_like}"
-    elif [[ "${_git}" == "true" ]]; then
+    if [[ "${_git}" == "true" ]]; then
       _git_unbundle \
         "${_tarname}"
     fi
