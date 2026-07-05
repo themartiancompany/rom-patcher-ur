@@ -54,6 +54,19 @@ fi
 if [[ ! -v "_git" ]]; then
   _git="false"
 fi
+if [[ ! -v "_tag_name" ]]; then
+  _tag_name="commit"
+fi
+_Pkg=RomPatcher.js
+_pkg=rom-patcher
+_commit="6e7ce4539eb3ff3f9aebd2c9f1493c19f576eee0"
+_pkgver=3.2.1
+_pkgver_module="3.0.0"
+if [[ ! -v "_tag" ]]; then
+  if [[ "${_tag_name}" == "commit" ]]; then
+    _tag="${_commit}"
+  fi
+fi
 if [[ ! -v "_npm" ]]; then
   _npm="false"
 fi
@@ -68,8 +81,6 @@ if [[ ! -v "${_archive_format}" ]]; then
     fi
   fi
 fi
-_Pkg=RomPatcher.js
-_pkg=rom-patcher
 pkgbase="${_pkg}"
 pkgname=(
   "${pkgbase}"
@@ -77,9 +88,7 @@ pkgname=(
 _pkgdesc=(
   "A ROM patcher made in Javascript."
 )
-_commit="6e7ce4539eb3ff3f9aebd2c9f1493c19f576eee0"
 pkgdesc="${_pkgdesc[*]}"
-_pkgver=3.2.1
 pkgver="${_pkgver}.1"
 if [[ "${_npm}" == "true" ]]; then
   pkgver="${_pkgver}"
@@ -115,7 +124,7 @@ if [[ "${_evmfs}" == "true" ]]; then
   )
 fi
 _url="${url}"
-_tarname="${_pkg}-${pkgver}"
+_tarname="${_Pkg}-${_tag}"
 _tarfile="${_tarname}.${_archive_format}"
 _github_sum="4a9dc27587411f8eb181d12ab82b68e97a58b5fa78734fe84bc4405a0f7be21a"
 _github_sig_sum="96f2a529fb8225b09704b56ff6ee69c3a023847c85ccd8256e34503f57479cd6"
@@ -171,9 +180,11 @@ source+=(
 sha256sums+=(
   "${_sum}"
 )
-noextract=(
-  "${_tarfile}"
-)
+if [[ "${_npm}" == "true" ]]; then
+  noextract=(
+    "${_tarfile}"
+  )
+fi
 
 _git_unbundle() {
   local \
@@ -223,7 +234,7 @@ build() {
   npm \
     pack
   mv \
-    "${_Pkg}-${_pkgver}.tgz" \
+    "${_pkg}-${_pkgver_module}.tgz" \
     "${srcdir}"
 }
 
@@ -250,7 +261,7 @@ package_rom-patcher() {
   npm \
     install \
     "${_npm_options[@]}" \
-    "${srcdir}/${_Pkg}-${_pkgver}.tgz"
+    "${srcdir}/${_pkg}-${_pkgver_module}.tgz"
   rm \
     -fr \
       "${pkgdir}/usr/etc"
