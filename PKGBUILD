@@ -1,24 +1,28 @@
 # SPDX-License-Identifier: AGPL-3.0
 
-#    ----------------------------------------------------------------------
-#    Copyright © 2024, 2025  Pellegrino Prevete
+#    -----------------------------------------------------
+#    Copyright © 2024, 2025, 2026  Pellegrino Prevete
 #
 #    All rights reserved
-#    ----------------------------------------------------------------------
+#    -----------------------------------------------------
 #
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
+#    This program is free software: you can redistribute
+#    it and/or modify it under the terms of the
+#    GNU Affero General Public License as published by
+#    the Free Software Foundation, either version 3 of
+#    the License, or (at your option) any later version.
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
+#    This program is distributed in the hope that it
+#    will be useful, but WITHOUT ANY WARRANTY;
+#    without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#    See the GNU Affero General Public License for
+#    more details.
 #
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+#    You should have received a copy of the
+#    GNU Affero General Public License
+#    along with this program.
+#    If not, see <https://www.gnu.org/licenses/>.
 
 # Maintainers:
 #   Truocolo
@@ -27,13 +31,11 @@
 #   Pellegrino Prevete (dvorak)
 #     <pellegrinoprevete@gmail.com>
 #     <dvorak@0x87003Bd6C074C713783df04f36517451fF34CBEf>
-#   Filipe Bertelli
-#     <filipebertelli@tutanota.com>
 
-_os="$( \
+_os="$(
   uname \
     -o)"
-_evmfs_available="$( \
+_evmfs_available="$(
   command \
     -v \
     "evmfs" || \
@@ -49,8 +51,11 @@ _node="nodejs"
 if [[ "${_os}" == "Android" ]]; then
   _node="nodejs-lts"
 fi
+if [[ ! -v "_git" ]]; then
+  _git="true"
+fi
 if [[ ! -v "_npm" ]]; then
-  _npm="true"
+  _npm="false"
 fi
 if [[ ! -v "_git_http" ]]; then
   _git_http="github"
@@ -63,40 +68,73 @@ if [[ ! -v "${_archive_format}" ]]; then
     fi
   fi
 fi
-_pkg=serve
-pkgbase="${_node}-${_pkg}"
+_Pkg=RomPatcher.js
+_pkg=rom-patcher
+pkgbase="${_pkg}"
 pkgname=(
   "${pkgbase}"
 )
 _pkgdesc=(
-  'Quick HTTP server'
+  "A ROM patcher made in Javascript."
 )
+_commit="6e7ce4539eb3ff3f9aebd2c9f1493c19f576eee0"
 pkgdesc="${_pkgdesc[*]}"
-pkgver=14.2.5
+_pkgver=3.2.1
+pkgver="${_pkgver}.1"
+if [[ "${_npm}" == "true" ]]; then
+  pkgver="${_pkgver}"
+fi
 pkgrel=1
 arch=(
   'any'
 )
 _http="https://${_git_http}.com"
-_ns="vercel"
-url="${_http}/${_ns}/${_pkg}"
+_ns="marcrobledo"
+_ns="themartiancompany"
+url="${_http}/${_ns}/${_Pkg}"
 license=(
   'MIT'
 )
 depends=(
   "${_node}"
-  "${_node}-inherits"
 )
 provides=(
-  "${_pkg}=${pkgver}"
+  "${_node}-${_pkg}=${pkgver}"
 )
 makedepends=(
   "npm"
 )
+if [[ "${_git}" == "true" ]]; then
+  makedepends+=(
+    "git"
+  )
+fi
+if [[ "${_evmfs}" == "true" ]]; then
+  makedepends+=(
+    "evmfs"
+  )
+fi
+_url="${url}"
 _tarname="${_pkg}-${pkgver}"
 _tarfile="${_tarname}.${_archive_format}"
-_sum="c0d39ad4cb5b5991b3860eeeba64d8d4f1aeb8f28035b08e12fb86182ca7456f"
-_sig_sum="1266c50d81a552dea0ba6ad4f435c83efb107bf056ceeaaddfb236f711f1be65"
+_github_sum="4a9dc27587411f8eb181d12ab82b68e97a58b5fa78734fe84bc4405a0f7be21a"
+_github_sig_sum="96f2a529fb8225b09704b56ff6ee69c3a023847c85ccd8256e34503f57479cd6"
+_bundle_sum="b27968d1f2320d4b0db8801a1200ba8c47f620c87172847733dc9d824fffde24"
+_bundle_sig_sum="98c2bd9d556d3c75912974cb3e13ea1c99ec7bf328ec791c7a02f21743445f4b"
+_npm_sum=""
+_npm_sig_sum=""
+if [[ "${_npm}" == "true" ]]; then
+  _sum="${_npm_sum}"
+  _sig_sum="${_npm_sig_sum}"
+elif [[ "${_npm}" == "false" ]]; then
+  if [[ "${_git}" == "false" ]]; then
+    _sum="${_github_sum}"
+    _sig_sum="${_github_sig_sum}"
+  elif [[ "${_git}" == "true" ]]; then
+    _sum="${_bundle_sum}"
+    _sig_sum="${_bundle_sig_sum}"
+  fi
+fi
 # Dvorak
 _evmfs_ns="0x87003Bd6C074C713783df04f36517451fF34CBEf"
 # Truocolo
@@ -122,6 +160,8 @@ if [[ "${_evmfs}" == "true" ]]; then
 elif [[ "${_evmfs}" == "false" ]]; then
   if [[ "${_npm}" == "true" ]]; then
     _uri="${_npm_http}/${_pkg}/-/${_tarfile}"
+  elif [[ "${_npm}" == "false" ]]; then
+    _uri="${_url}/archive/${_commit}.${_archive_format}"
   fi
 fi
 _src="${_tarfile}::${_uri}"
@@ -135,7 +175,7 @@ noextract=(
   "${_tarfile}"
 )
 
-package_nodejs-serve() {
+package_rom-patcher() {
   local \
     _npm_options=() \
     _find_opts=()
